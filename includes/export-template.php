@@ -55,51 +55,51 @@ function export_date_options( $post_type = 'post' ) {
 <form action="" method="get" id="export-filters">
 <input type="hidden" name="export_plus_download" value="true" />
 <input type="hidden" name="page" value="export_plus" />
-<p><label><input type="checkbox" class="selectall" value="all" checked="checked" /> <?php _e( 'Select all' ); ?></label></p>
+<p><label><input type="checkbox" class="selectall" value="all" checked="checked" /> <?php _e( 'Select all', 'export-plus' ); ?></label></p>
 
 <hr/>
 
-<p><label><input type="checkbox" name="content[]" value="menus" checked="checked" /> <?php _e( 'Menus' ); ?></label></p>
+<p><label><input type="checkbox" name="content[]" value="menus" checked="checked" /> <?php _e( 'Menus', 'export-plus' ); ?></label></p>
 
-<p><label><input type="checkbox" name="content[]" value="posts" checked="checked" /> <?php _e( 'Posts' ); ?></label></p>
+<p><label><input type="checkbox" name="content[]" value="posts" checked="checked" /> <?php _e( 'Posts', 'export-plus' ); ?></label></p>
 <ul id="post-filters" class="export-filters">
 	<li>
-		<label><?php _e( 'Categories:' ); ?></label>
-		<?php wp_dropdown_categories( array( 'show_option_all' => __('All') ) ); ?>
+		<label><?php _e( 'Categories:', 'export-plus' ); ?></label>
+		<?php wp_dropdown_categories( array( 'show_option_all' => __( 'All', 'export-plus' ) ) ); ?>
 	</li>
 </ul>
 
-<p><label><input type="checkbox" name="content[]" value="pages" checked="checked" /> <?php _e( 'Pages' ); ?></label></p>
+<p><label><input type="checkbox" name="content[]" value="pages" checked="checked" /> <?php _e( 'Pages', 'export-plus' ); ?></label></p>
 
 <?php foreach ( get_post_types( array( '_builtin' => false, 'can_export' => true ), 'objects' ) as $post_type ) : ?>
 <p><label><input type="checkbox" name="content[]" value="<?php echo esc_attr( $post_type->name ); ?>" checked="checked" /> <?php echo esc_html( $post_type->label ); ?></label></p>
 <?php endforeach; ?>
 
-<h3><?php _e( 'Filter exported content' ); ?></h3>
+<h3><?php _e( 'Filter exported content', 'export-plus' ); ?></h3>
 <ul class="export-filter">
 	<li>
-		<label><?php _e( 'Authors:' ); ?></label>
+		<label><?php _e( 'Authors:', 'export-plus' ); ?></label>
 <?php
 		global $wpdb;
 		$authors = $wpdb->get_col( "SELECT DISTINCT post_author FROM {$wpdb->posts}" );
-		wp_dropdown_users( array( 'include' => $authors, 'name' => 'post_author', 'multi' => true, 'show_option_all' => __('All') ) );
+		wp_dropdown_users( array( 'include' => $authors, 'name' => 'post_author', 'multi' => true, 'show_option_all' => __( 'All', 'export-plus' ) ) );
 ?>
 	</li>
 	<li>
-		<label><?php _e( 'Date range:' ); ?></label>
+		<label><?php _e( 'Date range:', 'export-plus' ); ?></label>
 		<select name="post_start_date">
-			<option value="0"><?php _e( 'Start Date' ); ?></option>
+			<option value="0"><?php _e( 'Start Date', 'export-plus' ); ?></option>
 			<?php export_date_options(); ?>
 		</select>
 		<select name="post_end_date">
-			<option value="0"><?php _e( 'End Date' ); ?></option>
+			<option value="0"><?php _e( 'End Date', 'export-plus' ); ?></option>
 			<?php export_date_options(); ?>
 		</select>
 	</li>
 	<li>
-		<label><?php _e( 'Status:' ); ?></label>
+		<label><?php _e( 'Status:', 'export-plus' ); ?></label>
 		<select name="post_status">
-			<option value="0"><?php _e( 'All' ); ?></option>
+			<option value="0"><?php _e( 'All', 'export-plus' ); ?></option>
 			<?php $post_stati = get_post_stati( array( 'internal' => false ), 'objects' );
 			foreach ( $post_stati as $status ) : ?>
 			<option value="<?php echo esc_attr( $status->name ); ?>"><?php echo esc_html( $status->label ); ?></option>
