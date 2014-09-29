@@ -3,7 +3,7 @@
  * Plugin Name: Export Plus
  * Version: 1.0
  * Plugin URI: https://wordpress.org/plugins/export-plus/
- * Description: An improved export tool for your WordPress site.
+ * Description: A greatly improved export tool for your WordPress site.
  * Author: Hugh Lashbrooke
  * Author URI: http://www.hughlashbrooke.com/
  * Requires at least: 3.9

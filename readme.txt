@@ -8,11 +8,11 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-An improved export tool for your WordPress site
+A greatly improved export tool for your WordPress site.
 
 == Description ==
 
-The export tool that is built into WordPress limits how you can export your data by giving you a restrictive UI and very few options. This plugin fixes that by adding a new export page with more flexible options through the use of checkboxes. By using "Export Plus" you can easily export any selection of post types filtered by author, date and status across *all* of them, not just the built-in ones.
+The export tool built into WordPress limits how you can export your data by giving you a restrictive UI and very few options. This plugin fixes that by adding a new export page with more flexible options through the cunning use of checkboxes (instead of radio buttons). By using "Export Plus" you can easily export any selection of post types filtered by author, date and status across *all* of them, not just the built-in ones.
 
 See the plugin [screenshots](https://wordpress.org/plugins/export-plus/screenshots/) for the differences that "Export Plus" provides.
 
@@ -40,16 +40,16 @@ No - it adds a secondary export page that you can use instead of WordPress' buil
 
 == Screenshots ==
 
-1. The export tool provided by this plugin with a few custo post types included.
+1. The export tool provided by this plugin with a few custom post types included.
 
 == Changelog ==
 
 = 1.0 =
-* 2014-09-24
+* 2014-09-29
 * Initial release #boom
 
 == Upgrade Notice ==
 
 = 1.0 =
-* 2014-09-24
+* 2014-09-29
 * Initial release #boom
