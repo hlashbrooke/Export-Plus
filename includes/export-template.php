@@ -20,7 +20,7 @@ if ( !current_user_can('export') ) {
  *
  * @param string $post_type The post type. Default 'post'.
  */
-function export_date_options( $post_type = 'post' ) {
+function export_plus_date_options( $post_type = 'post' ) {
 	global $wpdb, $wp_locale;
 
 	$months = $wpdb->get_results( $wpdb->prepare( "
@@ -45,7 +45,7 @@ function export_date_options( $post_type = 'post' ) {
 ?>
 
 <div class="wrap">
-<h2><?php _e( 'Export+', 'export-plus' ); ?></h2>
+<h2><?php _e( 'Export Plus', 'export-plus' ); ?></h2>
 
 <p><?php _e('When you click the button below WordPress will create an XML file for you to save to your computer.'); ?></p>
 <p><?php _e('This format, which we call WordPress eXtended RSS or WXR, will contain your posts, pages, comments, custom fields, categories, and tags.'); ?></p>
@@ -89,11 +89,11 @@ function export_date_options( $post_type = 'post' ) {
 		<label><?php _e( 'Date range:', 'export-plus' ); ?></label>
 		<select name="post_start_date">
 			<option value="0"><?php _e( 'Start Date', 'export-plus' ); ?></option>
-			<?php export_date_options(); ?>
+			<?php export_plus_date_options(); ?>
 		</select>
 		<select name="post_end_date">
 			<option value="0"><?php _e( 'End Date', 'export-plus' ); ?></option>
-			<?php export_date_options(); ?>
+			<?php export_plus_date_options(); ?>
 		</select>
 	</li>
 	<li>

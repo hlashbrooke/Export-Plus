@@ -99,6 +99,9 @@ class Export_Plus {
 		// Add Export+ page to menu
 		add_action( 'admin_menu', array( $this, 'add_submenu_page' ) );
 
+		// Remove Export page from menu
+		add_action( 'admin_menu', array( $this, 'remove_export_page' ) );
+
 		// Process download
 		add_action( 'admin_init', array( $this, 'download' ) );
 
@@ -111,7 +114,13 @@ class Export_Plus {
 	} // End __construct ()
 
 	public function add_submenu_page () {
-		add_submenu_page( 'tools.php', __( 'Export+', 'export-plus' ), __( 'Export+', 'export-plus' ), 'export', 'export_plus', array( $this, 'export_page' ) );
+		add_submenu_page( 'tools.php', __( 'Export Plus', 'export-plus' ), __( 'Export Plus', 'export-plus' ), 'export', 'export_plus', array( $this, 'export_page' ) );
+	}
+
+	public function remove_export_page () {
+		if( apply_filters( $this->_token . '_hide_export', false ) ) {
+			remove_submenu_page( 'tools.php', 'export.php' );
+		}
 	}
 
 	public function export_page () {
