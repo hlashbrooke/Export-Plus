@@ -155,11 +155,31 @@ function export_wp_plus( $args = array() ) {
 				foreach( $posts as $post ) {
 					$post_ids[] = $post->ID;
 				}
+
+				// Clean up
+				unset( $posts );
 			}
 		}
  	}
 
+	// Get attachments
+	if( !empty( $post_ids ) ) {
+		$attachments = get_posts( array(
+			'post_type' => 'attachment',
+			'post_status' => 'any',
+			'post_parent__in' => $post_ids,
+			'posts_per_page' => -1,
+		) );
+		foreach( $attachments as $attachment ) {
+			$post_ids[] = $attachment->ID;
+		}
 
+		// Clean up
+		unset( $attachments );
+	}
+
+	// Allow third-party to filter posts
+	$post_ids = apply_filters('wp_export_post_ids', $post_ids);
 
 	// Get the requested terms ready
 	$cats = $tags = $terms = array();
