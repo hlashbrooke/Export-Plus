@@ -159,7 +159,17 @@ function export_wp_plus( $args = array() ) {
 		}
  	}
 
+	// Get associated featured images
+	if( !empty( $post_ids ) ) {
+		foreach( $post_ids as $id ) {
+			if( $thumbnail_id = get_post_meta( $id, '_thumbnail_id', true ) ) {
+				$post_ids[] = $thumbnail_id;
+			}
+		}
+	}
 
+	// Allow third-party to filter posts
+	$post_ids = apply_filters('wp_export_post_ids', $post_ids);
 
 	// Get the requested terms ready
 	$cats = $tags = $terms = array();
