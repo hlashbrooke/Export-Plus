@@ -155,17 +155,27 @@ function export_wp_plus( $args = array() ) {
 				foreach( $posts as $post ) {
 					$post_ids[] = $post->ID;
 				}
+
+				// Clean up
+				unset( $posts );
 			}
 		}
  	}
 
-	// Get associated featured images
+	// Get attachments
 	if( !empty( $post_ids ) ) {
-		foreach( $post_ids as $id ) {
-			if( $thumbnail_id = get_post_meta( $id, '_thumbnail_id', true ) ) {
-				$post_ids[] = $thumbnail_id;
-			}
+		$attachments = get_posts( array(
+			'post_type' => 'attachment',
+			'post_status' => 'any',
+			'post_parent__in' => $post_ids,
+			'posts_per_page' => -1,
+		) );
+		foreach( $attachments as $attachment ) {
+			$post_ids[] = $attachment->ID;
 		}
+
+		// Clean up
+		unset( $attachments );
 	}
 
 	// Allow third-party to filter posts
