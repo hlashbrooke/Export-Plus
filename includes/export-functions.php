@@ -89,8 +89,9 @@ function export_wp_plus( $args = array() ) {
 		if ( $args['start_date'] )
 			$date_query[]['after'] = $args['start_date'];
 
-		if ( $args['end_date'] )
-			$date_query[]['before'] = $args['end_date'];
+		if ( $args['end_date'] ) {
+			$date_query[]['before'] =  '@' . strtotime( '+1 month', strtotime( $args['end_date'] ) );
+		}
 
 		if ( ! empty( $date_query ) ) {
 			$query_args['date_query'] = $date_query;
