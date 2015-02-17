@@ -39,10 +39,12 @@ function export_wp_plus( $args = array() ) {
 	 */
 	do_action( 'export_wp', $args );
 
+	// Set export file name
 	$sitename = sanitize_key( get_bloginfo( 'name' ) );
 	if ( ! empty($sitename) ) $sitename .= '.';
 	$filename = $sitename . 'wordpress.' . date( 'Y-m-d' ) . '.xml';
 
+	// Set content headers
 	header( 'Content-Description: File Transfer' );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Type: text/xml; charset=' . get_option( 'blog_charset' ), true );
@@ -52,22 +54,30 @@ function export_wp_plus( $args = array() ) {
 		'posts_per_page' => -1
 	);
 
-	if ( 'all' != $args['content'] && post_type_exists( $args['content'] ) ) {
-		$query_args['post_type'] = $args['content'];
+	if ( 'all' != $args['content'] ) {
+		$args['content'] = (array) $args['content'];
 
-		$ptype = get_post_type_object( $args['content'] );
+		$query_args['post_type'] = array();
 
-		if ( ! $ptype->can_export )
+		foreach( $args['content'] as $post_type ) {
+			$post_type_object = get_post_type_object( $post_type );
+
+			if ( $post_type_object->can_export ) {
+				$query_args['post_type'][] = $post_type;
+			}
+		}
+
+		if ( empty( $query_args['post_type'] ) ) {
 			$query_args['post_type'] = 'post';
+		}
 	} else {
-		$query_args['post_type'] = get_post_types( array( 'can_export' => true ) );
+		$query_args['post_type'] = array_values( get_post_types( array( 'can_export' => true ) ) );
 	}
 
 	if ( $args['status'] && ( 'post' == $args['content'] || 'page' == $args['content'] ) ) {
 		$query_args['post_status'] = $args['status'];
 	}
 
-	$join = '';
 	if ( $args['category'] && 'post' == $args['content'] ) {
 		if ( $term = term_exists( $args['category'], 'category' ) ) {
 			$query_args['tax_query'] = array(
@@ -120,23 +130,30 @@ function export_wp_plus( $args = array() ) {
 		$custom_taxonomies = get_taxonomies( array( '_builtin' => false ) );
 		$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
 
-		// Put categories in order with no child going before its parent.
-		while ( $cat = array_shift( $categories ) ) {
-			if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) )
-				$cats[$cat->term_id] = $cat;
-			else
-				$categories[] = $cat;
+		// Put categories in order with no child going before its parent
+		if( count( $categories ) > 0 ) {
+			while ( $cat = array_shift( $categories ) ) {
+				if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) ) {
+					$cats[$cat->term_id] = $cat;
+				} else {
+					$categories[] = $cat;
+				}
+			}
 		}
 
-		// Put terms in order with no child going before its parent.
-		while ( $t = array_shift( $custom_terms ) ) {
-			if ( $t->parent == 0 || isset( $terms[$t->parent] ) )
-				$terms[$t->term_id] = $t;
-			else
-				$custom_terms[] = $t;
+		// Put terms in order with no child going before its parent
+		if( count( $custom_terms ) > 0 ) {
+			while ( $t = array_shift( $custom_terms ) ) {
+				if ( $t->parent == 0 || isset( $terms[$t->parent] ) ) {
+					$terms[$t->term_id] = $t;
+				} else {
+					$custom_terms[] = $t;
+				}
+			}
 		}
 
-		unset( $categories, $custom_taxonomies, $custom_terms );
+		// Clean up
+		unset( $categories, $custom_taxonomies, $custom_terms, $taxonomies, $tax );
 	}
 
 	/**
