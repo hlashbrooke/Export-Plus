@@ -110,9 +110,10 @@ function export_wp_plus( $args = array() ) {
 
 	$query_args = apply_filters( 'export_wp_query_args', $query_args, $args );
 
-	$query_args['fields'] = 'ids';
+	$post_query_args = $query_args;
+	$post_query_args['fields'] = 'ids';
 
-	$post_ids = get_posts( $query_args );
+	$post_ids = get_posts( $post_query_args );
 
 	/*
 	 * Get the requested terms ready, empty unless posts filtered by category
