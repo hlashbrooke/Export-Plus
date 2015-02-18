@@ -138,6 +138,7 @@ class Export_Plus {
 		if ( isset( $_GET['content'] ) && count( $_GET['content'] ) > 0 ) {
 			foreach( $_GET['content'] as $post_type ) {
 				switch( $post_type ) {
+					case 'menus': $post_type = 'nav_menu_item'; break;
 					case 'posts': $post_type = 'post'; break;
 					case 'pages': $post_type = 'page'; break;
 				}
