@@ -62,7 +62,7 @@ function export_wp_plus( $args = array() ) {
 		foreach( $args['content'] as $post_type ) {
 			$post_type_object = get_post_type_object( $post_type );
 
-			if ( $post_type_object->can_export ) {
+			if ( $post_type_object && $post_type_object->can_export ) {
 				$query_args['post_type'][] = $post_type;
 			}
 		}
