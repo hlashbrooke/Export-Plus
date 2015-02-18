@@ -132,7 +132,7 @@ function export_wp_plus( $args = array() ) {
 		$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
 
 		// Put categories in order with no child going before its parent
-		if( count( $categories ) > 0 ) {
+		if( $categories ) {
 			while ( $cat = array_shift( $categories ) ) {
 				if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) ) {
 					$cats[$cat->term_id] = $cat;
@@ -143,7 +143,7 @@ function export_wp_plus( $args = array() ) {
 		}
 
 		// Put terms in order with no child going before its parent
-		if( count( $custom_terms ) > 0 ) {
+		if( $custom_terms ) {
 			while ( $t = array_shift( $custom_terms ) ) {
 				if ( $t->parent == 0 || isset( $terms[$t->parent] ) ) {
 					$terms[$t->term_id] = $t;
@@ -154,7 +154,7 @@ function export_wp_plus( $args = array() ) {
 		}
 
 		// Clean up
-		unset( $categories, $custom_taxonomies, $custom_terms, $taxonomies, $tax );
+		unset( $categories, $custom_taxonomies, $custom_terms );
 	}
 
 	/**
@@ -415,8 +415,6 @@ function export_wp_plus( $args = array() ) {
 	$query_args['paged'] = 1;
 
 	$query = new WP_Query( $query_args );
-
-	global $post;
 
 	// Paginate posts 20 at a time
 	while ( $query->have_posts() ) {
