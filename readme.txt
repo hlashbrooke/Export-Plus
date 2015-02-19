@@ -1,10 +1,10 @@
 === Export Plus ===
-Contributors: hlashbrooke
+Contributors: hlashbrooke, sc0ttkclark
 Donate link: http://www.hughlashbrooke.com/donate
-Tags: export, tools, utilities, import
+Tags: export, tools, utilities, import, migration, migrate
 Requires at least: 4.0
-Tested up to: 4.1
-Stable tag: 1.0
+Tested up to: 4.1.1
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,9 +12,9 @@ A greatly improved export tool for your WordPress site.
 
 == Description ==
 
-The export tool built into WordPress limits how you can export your data by giving you a restrictive UI and very few options. This plugin fixes that by adding a new export page with more flexible options through the cunning use of checkboxes (instead of radio buttons). By using "Export Plus" you can easily export any selection of post types filtered by author, date and status across *all* of them, not just the built-in ones.
+The export tool built into WordPress limits how you can export your data by giving you a restrictive UI and very few options. This plugin fixes that by adding a new export page with more flexible options through the cunning use of checkboxes (instead of radio buttons). By using Export Plus you can easily export any selection of post types filtered by author, date and status across *all* of them, not just the built-in ones.
 
-See the plugin [screenshots](https://wordpress.org/plugins/export-plus/screenshots/) for the differences that "Export Plus" provides.
+See the plugin [screenshots](https://wordpress.org/plugins/export-plus/screenshots/) for the differences that Export Plus provides.
 
 I originally submitted this as a [patch](https://core.trac.wordpress.org/ticket/27048) to WordPress Core, but it doesn't look like it's going to be added so I decided to release it as a plugin instead.
 
@@ -44,12 +44,20 @@ No - it adds a secondary export page that you can use instead of WordPress' buil
 
 == Changelog ==
 
+= 1.1 =
+* 2015-02-20
+* [UPDATE] Refreshing export function against WordPress core (props sc0ttkclark)
+* [UPDATE] Optimising and paginating queries (props sc0ttkclark)
+* [TWEAK] Adding comments (props sc0ttkclark)
+* [FIX] Fixing menu exporting (props sc0ttkclark)
+* [FIX] Fixing can_export check for post type objects (props sc0ttkclark)
+
 = 1.0 =
 * 2014-09-29
 * Initial release #boom
 
 == Upgrade Notice ==
 
-= 1.0 =
-* 2014-09-29
-* Initial release #boom
+= 1.1 =
+* 2014-02-20
+* General improvements and optimisations
