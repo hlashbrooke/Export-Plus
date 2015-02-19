@@ -16,11 +16,11 @@
 define( 'WXR_VERSION', '1.2' );
 
 /**
- * Generates the WXR export file for download
+ * Generates the WXR export file for download.
  *
  * @since 2.1.0
  *
- * @param array $args Filters defining what should be included in the export
+ * @param array $args Filters defining what should be included in the export.
  */
 function export_wp_plus( $args = array() ) {
 	global $wpdb, $post;
@@ -49,155 +49,90 @@ function export_wp_plus( $args = array() ) {
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Type: text/xml; charset=' . get_option( 'blog_charset' ), true );
 
-	$post_types = array();
-	$post_ids = array();
-	$types_to_query = array();
+	$query_args = array(
+		'post_status' => 'any',
+		'posts_per_page' => -1
+	);
 
-	if( count( $args['content'] ) > 0 ) {
+	if ( 'all' != $args['content'] ) {
+		$args['content'] = (array) $args['content'];
 
-		// Get queried post types
+		$query_args['post_type'] = array();
+
 		foreach( $args['content'] as $post_type ) {
-			if( ! post_type_exists( $post_type ) )
-				continue;
-			$ptype = get_post_type_object( $post_type );
+			$post_type_object = get_post_type_object( $post_type );
 
-			if ( ! $ptype->can_export )
-				continue;
-
-			$post_types[] = $post_type;
- 		}
-
- 		$query_args = $post_query_args = array();
-		$post_cat = false;
-
-		if( count( $post_types ) > 0 ) {
-			$types_to_query = $post_types;
-
-			// Build up query arguments
-			$query_args['posts_per_page'] = -1;
-
-			// Get queried post stati
-			if( $args['status'] ) {
-				$query_args['post_status'] = $args['status'];
-			} else {
-				$post_stati = get_post_stati();
-				$statuses = array();
-				foreach( $post_stati as $status ) {
-					if( 'auto-draft' != $status ) {
-						$statuses[] = $status;
-					}
-				}
-				if( count( $statuses ) > 0 ) {
-					$query_args['post_status'] = $statuses;
-				}
-			}
-
-			// Get queried author
-			if( $args['author'] ) {
-				$query_args['author'] = $args['author'];
-			}
-
-			// Get queried start date
-			if( $args['start_date'] ) {
-				$start_date = explode( '-', $args['start_date'] );
-				$query_args['date_query'][0]['after'] = array(
-					'year' => $start_date[0],
-					'month' => $start_date[1],
-					'day' => 1
-				);
-			}
-
-			// Get queried end date
-			if( $args['end_date'] ) {
-				$end_date = explode( '-', $args['end_date'] );
-				$last_day = date( 't', strtotime( $args['end_date'] ) );
-				$query_args['date_query'][0]['before'] = array(
-					'year' => $end_date[0],
-					'month' => $end_date[1],
-					'day' => $last_day
-				);
-			}
-
-			// Include first and last days of month in date queries
-			if( isset( $query_args['date_query']) ) {
-				$query_args['date_query'][0]['inclusive'] = true;
-			}
-
-			// Get queried category and fetch posts of type 'post' for that category
-			if ( $args['category'] && in_array( 'post', $post_types ) ) {
-				if ( $post_cat = term_exists( $args['category'], 'category' ) ) {
-
-					$post_query_args = $query_args;
-
-					$post_query_args['post_type'] = 'post';
-					$post_query_args['category'] = $args['category'];
-
-					$posts = get_posts( $post_query_args );
-					foreach( $posts as $post ) {
-						$post_ids[] = $post->ID;
-					}
-
-					// Remove 'post' from post types to query
-					$types_to_query = array();
-					foreach( $post_types as $type ) {
-						if( 'post' != $type ) {
-							$types_to_query[] = $type;
-						}
-					}
-				}
-			}
-
-			// Query all remaininng post types
-			if( count( $types_to_query ) > 0 ) {
-				$query_args['post_type'] = $types_to_query;
-
-				$posts = get_posts( $query_args );
-				foreach( $posts as $post ) {
-					$post_ids[] = $post->ID;
-				}
+			if ( $post_type_object && $post_type_object->can_export ) {
+				$query_args['post_type'][] = $post_type;
 			}
 		}
- 	}
 
+		if ( empty( $query_args['post_type'] ) ) {
+			$query_args['post_type'] = 'post';
+		}
+	} else {
+		$query_args['post_type'] = array_values( get_post_types( array( 'can_export' => true ) ) );
+	}
 
+	if ( $args['status'] && ( 'post' == $args['content'] || 'page' == $args['content'] ) ) {
+		$query_args['post_status'] = $args['status'];
+	}
 
-	// Get the requested terms ready
+	if ( $args['category'] && 'post' == $args['content'] ) {
+		if ( $term = term_exists( $args['category'], 'category' ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'category',
+					'terms' => $term->term_id,
+					'include_children' => false
+				)
+			);
+		}
+	}
+
+	if ( 'post' == $args['content'] || 'page' == $args['content'] ) {
+		if ( $args['author'] )
+			$query_args['author'] = (int) $args['author'];
+
+		$date_query = array();
+
+		if ( $args['start_date'] )
+			$date_query[]['after'] = $args['start_date'];
+
+		if ( $args['end_date'] ) {
+			$date_query[]['before'] =  '@' . strtotime( '+1 month', strtotime( $args['end_date'] ) );
+		}
+
+		if ( ! empty( $date_query ) ) {
+			$query_args['date_query'] = $date_query;
+		}
+	}
+
+	$query_args = apply_filters( 'export_wp_query_args', $query_args, $args );
+
+	$post_query_args = $query_args;
+	$post_query_args['fields'] = 'ids';
+
+	$post_ids = get_posts( $post_query_args );
+
+	/*
+	 * Get the requested terms ready, empty unless posts filtered by category
+	 * or all content.
+	 */
 	$cats = $tags = $terms = array();
+	if ( isset( $term ) && $term ) {
+		$cat = get_term( $term['term_id'], 'category' );
+		$cats = array( $cat->term_id => $cat );
+		unset( $term, $cat );
+	} else if ( 'all' == $args['content'] ) {
+		$categories = (array) get_categories( array( 'get' => 'all' ) );
+		$tags = (array) get_tags( array( 'get' => 'all' ) );
 
-	if( count( $post_types ) > 0 ) {
-
-		$custom_taxonomies = $custom_terms = $categories = array();
-
-		// Get taxonomies for each post type
-		foreach( $post_types as $type ) {
-
-			if( 'post' == $type ) continue;
-
-			$taxonomies = get_object_taxonomies( $type );
-			foreach( $taxonomies as $tax ) {
-				array_unshift( $custom_taxonomies, $tax );
-			}
- 		}
-
- 		// Get terms for each custom taxonomy
-		if( count( $custom_taxonomies ) > 0 ) {
-			$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
- 		}
-
- 		// Get tags and categories for posts
-		if( in_array( 'post', $post_types ) ) {
-			if ( $post_cat ) {
-				$cat = get_term( $post_cat['term_id'], 'category' );
-				$cats = array( $cat->term_id => $cat );
-				unset( $cat );
-			} else {
-				$categories = (array) get_categories( array( 'get' => 'all' ) );
-			}
-			$tags = (array) get_tags( array( 'get' => 'all' ) );
-		}
+		$custom_taxonomies = get_taxonomies( array( '_builtin' => false ) );
+		$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
 
 		// Put categories in order with no child going before its parent
-		if( count( $categories ) > 0 ) {
+		if( $categories ) {
 			while ( $cat = array_shift( $categories ) ) {
 				if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) ) {
 					$cats[$cat->term_id] = $cat;
@@ -208,7 +143,7 @@ function export_wp_plus( $args = array() ) {
 		}
 
 		// Put terms in order with no child going before its parent
-		if( count( $custom_terms ) > 0 ) {
+		if( $custom_terms ) {
 			while ( $t = array_shift( $custom_terms ) ) {
 				if ( $t->parent == 0 || isset( $terms[$t->parent] ) ) {
 					$terms[$t->term_id] = $t;
@@ -219,7 +154,7 @@ function export_wp_plus( $args = array() ) {
 		}
 
 		// Clean up
-		unset( $categories, $custom_taxonomies, $custom_terms, $taxonomies, $tax );
+		unset( $categories, $custom_taxonomies, $custom_terms );
 	}
 
 	/**
@@ -468,7 +403,7 @@ function export_wp_plus( $args = array() ) {
 <?php foreach ( $terms as $t ) : ?>
 	<wp:term><wp:term_id><?php echo $t->term_id ?></wp:term_id><wp:term_taxonomy><?php echo $t->taxonomy; ?></wp:term_taxonomy><wp:term_slug><?php echo $t->slug; ?></wp:term_slug><wp:term_parent><?php echo $t->parent ? $terms[$t->parent]->slug : ''; ?></wp:term_parent><?php wxr_term_name( $t ); ?><?php wxr_term_description( $t ); ?></wp:term>
 <?php endforeach; ?>
-<?php if ( in_array( 'menus', $args['content'] ) ) wxr_nav_menu_terms(); ?>
+<?php if ( 'all' == $args['content'] ) wxr_nav_menu_terms(); ?>
 
 	<?php
 	/** This action is documented in wp-includes/feed-rss2.php */
@@ -476,24 +411,24 @@ function export_wp_plus( $args = array() ) {
 	?>
 
 <?php if ( $post_ids ) {
-	global $wp_query;
+	$query_args['posts_per_page'] = 20;
+	$query_args['paged'] = 1;
 
-	// Fake being in the loop.
-	$wp_query->in_the_loop = true;
+	$query = new WP_Query( $query_args );
 
-	// Fetch 20 posts at a time rather than loading the entire table into memory.
-	while ( $next_posts = array_splice( $post_ids, 0, 20 ) ) {
-	$where = 'WHERE ID IN (' . join( ',', $next_posts ) . ')';
-	$posts = $wpdb->get_results( "SELECT * FROM {$wpdb->posts} $where" );
+	// Paginate posts 20 at a time
+	while ( $query->have_posts() ) {
+		// Begin Loop.
+		while ( $query->have_posts() ) {
+			$query->the_post();
 
-	// Begin Loop.
-	foreach ( $posts as $post ) {
-		setup_postdata( $post );
-		$is_sticky = is_sticky( $post->ID ) ? 1 : 0;
+			$is_sticky = is_sticky( $post->ID ) ? 1 : 0;
 ?>
 	<item>
-		<?php /** This filter is documented in wp-includes/feed.php */ ?>
-		<title><?php echo apply_filters( 'the_title_rss', $post->post_title ); ?></title>
+		<title><?php
+			/** This filter is documented in wp-includes/feed.php */
+			echo apply_filters( 'the_title_rss', $post->post_title );
+		?></title>
 		<link><?php the_permalink_rss() ?></link>
 		<pubDate><?php echo mysql2date( 'D, d M Y H:i:s +0000', get_post_time( 'Y-m-d H:i:s', true ), false ); ?></pubDate>
 		<dc:creator><?php echo wxr_cdata( get_the_author_meta( 'login' ) ); ?></dc:creator>
@@ -600,9 +535,15 @@ function export_wp_plus( $args = array() ) {
 <?php	endforeach; ?>
 	</item>
 <?php
-	}
+		}
+
+		// Fetch next page of posts
+		$query_args['paged']++;
+
+		$query->query( $query_args );
 	}
 } ?>
 </channel>
-</rss><?php
+</rss>
+<?php
 }

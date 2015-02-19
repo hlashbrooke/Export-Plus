@@ -6,8 +6,8 @@
  * Description: A greatly improved export tool for your WordPress site.
  * Author: Hugh Lashbrooke
  * Author URI: http://www.hughlashbrooke.com/
- * Requires at least: 3.9
- * Tested up to: 4.0
+ * Requires at least: 4.0
+ * Tested up to: 4.1
  *
  * @package WordPress
  * @author Hugh Lashbrooke
