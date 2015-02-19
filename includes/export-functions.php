@@ -108,12 +108,32 @@ function export_wp_plus( $args = array() ) {
 		}
 	}
 
+	/**
+	 * Filter WP_Query arguments for which posts to export.
+	 *
+	 * @todo Update since
+	 * @since 4.X
+	 *
+	 * @param array $query_args An array of WP_Query arguments.
+	 * @param array $args An array of export arguments.
+	 */
 	$query_args = apply_filters( 'export_wp_query_args', $query_args, $args );
 
-	$post_query_args = $query_args;
-	$post_query_args['fields'] = 'ids';
+	$query_args['fields'] = 'ids';
 
-	$post_ids = get_posts( $post_query_args );
+	$post_ids = get_posts( $query_args );
+
+	/**
+	 * Filter Post IDs to be exported.
+	 *
+	 * @todo Update since
+	 * @since 4.X
+	 *
+	 * @param array $post_ids An array of Post IDs to export.
+	 * @param array $query_args An array of WP_Query arguments.
+	 * @param array $args An array of export arguments.
+	 */
+	$post_ids = apply_filters( 'export_wp_post_ids', $post_ids, $query_args, $args );
 
 	/*
 	 * Get the requested terms ready, empty unless posts filtered by category
@@ -410,19 +430,28 @@ function export_wp_plus( $args = array() ) {
 	do_action( 'rss2_head' );
 	?>
 
-<?php if ( $post_ids ) {
-	$query_args['posts_per_page'] = 20;
-	$query_args['paged'] = 1;
+<?php
+	if ( $post_ids ) {
+		$posts_per_page = 20;
 
-	$query = new WP_Query( $query_args );
+		$wp_query_args = array(
+			'post_type'      => 'any',
+			'post_status'    => 'any',
+			'posts_per_page' => $posts_per_page,
+			'post__in'       => array_slice( $post_ids, 0, $posts_per_page )
+		);
 
-	// Paginate posts 20 at a time
-	while ( $query->have_posts() ) {
-		// Begin Loop.
+		$query = new WP_Query( $wp_query_args );
+
+		$page = 0;
+
+		// Paginate posts 20 at a time
 		while ( $query->have_posts() ) {
-			$query->the_post();
+			// Begin Loop.
+			while ( $query->have_posts() ) {
+				$query->the_post();
 
-			$is_sticky = is_sticky( $post->ID ) ? 1 : 0;
+				$is_sticky = is_sticky( $post->ID ) ? 1 : 0;
 ?>
 	<item>
 		<title><?php
@@ -535,14 +564,17 @@ function export_wp_plus( $args = array() ) {
 <?php	endforeach; ?>
 	</item>
 <?php
+			}
+
+			// Fetch next set of posts
+			$wp_query_args['post__in'] = array_slice( $post_ids, ( $page * $posts_per_page ), $posts_per_page );
+
+			$query->query( $wp_query_args );
+
+			$page++;
 		}
-
-		// Fetch next page of posts
-		$query_args['paged']++;
-
-		$query->query( $query_args );
 	}
-} ?>
+?>
 </channel>
 </rss>
 <?php
