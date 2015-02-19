@@ -154,8 +154,8 @@ function export_wp_plus( $args = array() ) {
 		// Put categories in order with no child going before its parent
 		if( $categories ) {
 			while ( $cat = array_shift( $categories ) ) {
-				if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) ) {
-					$cats[$cat->term_id] = $cat;
+				if ( $cat->parent == 0 || isset( $cats[ $cat->parent ] ) ) {
+					$cats[ $cat->term_id ] = $cat;
 				} else {
 					$categories[] = $cat;
 				}
@@ -165,8 +165,8 @@ function export_wp_plus( $args = array() ) {
 		// Put terms in order with no child going before its parent
 		if( $custom_terms ) {
 			while ( $t = array_shift( $custom_terms ) ) {
-				if ( $t->parent == 0 || isset( $terms[$t->parent] ) ) {
-					$terms[$t->term_id] = $t;
+				if ( $t->parent == 0 || isset( $terms[ $t->parent ] ) ) {
+					$terms[ $t->term_id ] = $t;
 				} else {
 					$custom_terms[] = $t;
 				}
@@ -415,13 +415,13 @@ function export_wp_plus( $args = array() ) {
 <?php wxr_authors_list( $post_ids ); ?>
 
 <?php foreach ( $cats as $c ) : ?>
-	<wp:category><wp:term_id><?php echo $c->term_id ?></wp:term_id><wp:category_nicename><?php echo $c->slug; ?></wp:category_nicename><wp:category_parent><?php echo $c->parent ? $cats[$c->parent]->slug : ''; ?></wp:category_parent><?php wxr_cat_name( $c ); ?><?php wxr_category_description( $c ); ?></wp:category>
+	<wp:category><wp:term_id><?php echo $c->term_id ?></wp:term_id><wp:category_nicename><?php echo $c->slug; ?></wp:category_nicename><wp:category_parent><?php echo $c->parent ? $cats[ $c->parent ]->slug : ''; ?></wp:category_parent><?php wxr_cat_name( $c ); ?><?php wxr_category_description( $c ); ?></wp:category>
 <?php endforeach; ?>
 <?php foreach ( $tags as $t ) : ?>
 	<wp:tag><wp:term_id><?php echo $t->term_id ?></wp:term_id><wp:tag_slug><?php echo $t->slug; ?></wp:tag_slug><?php wxr_tag_name( $t ); ?><?php wxr_tag_description( $t ); ?></wp:tag>
 <?php endforeach; ?>
 <?php foreach ( $terms as $t ) : ?>
-	<wp:term><wp:term_id><?php echo $t->term_id ?></wp:term_id><wp:term_taxonomy><?php echo $t->taxonomy; ?></wp:term_taxonomy><wp:term_slug><?php echo $t->slug; ?></wp:term_slug><wp:term_parent><?php echo $t->parent ? $terms[$t->parent]->slug : ''; ?></wp:term_parent><?php wxr_term_name( $t ); ?><?php wxr_term_description( $t ); ?></wp:term>
+	<wp:term><wp:term_id><?php echo $t->term_id ?></wp:term_id><wp:term_taxonomy><?php echo $t->taxonomy; ?></wp:term_taxonomy><wp:term_slug><?php echo $t->slug; ?></wp:term_slug><wp:term_parent><?php echo $t->parent ? $terms[ $t->parent ]->slug : ''; ?></wp:term_parent><?php wxr_term_name( $t ); ?><?php wxr_term_description( $t ); ?></wp:term>
 <?php endforeach; ?>
 <?php if ( 'all' == $args['content'] ) wxr_nav_menu_terms(); ?>
 
