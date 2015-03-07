@@ -71,6 +71,8 @@ function export_plus_date_options( $post_type = 'post' ) {
 
 <p><label><input type="checkbox" name="content[]" value="pages" checked="checked" /> <?php _e( 'Pages', 'export-plus' ); ?></label></p>
 
+<p><label><input type="checkbox" name="content[]" value="attachment" checked="checked" /> <?php _e( 'Attachments', 'export-plus' ); ?></label></p>
+
 <?php foreach ( get_post_types( array( '_builtin' => false, 'can_export' => true ), 'objects' ) as $post_type ) : ?>
 <p><label><input type="checkbox" name="content[]" value="<?php echo esc_attr( $post_type->name ); ?>" checked="checked" /> <?php echo esc_html( $post_type->label ); ?></label></p>
 <?php endforeach; ?>
