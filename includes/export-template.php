@@ -38,6 +38,22 @@ function export_plus_date_options( $post_type = 'post' ) {
 }
 ?>
 
+<script type="text/javascript">
+	var days_since_start = <?php echo $days_since_start; ?>;
+	jQuery(document).ready(function($){
+			$('#post-start-date-picker').datepicker({
+			dateFormat: 'yyyy-mm-dd',
+			minDate: days_since_start,
+			maxDate: 0
+		});
+		$('#post-end-date-picker').datepicker({
+			dateFormat: 'yyyy-mm-dd',
+			minDate: days_since_start,
+			maxDate: 0
+		});
+	});
+</script>
+
 <div class="wrap">
 <h2><?php _e( 'Export Plus', 'export-plus' ); ?></h2>
 
