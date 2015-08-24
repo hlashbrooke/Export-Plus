@@ -188,6 +188,7 @@ class Export_Plus {
 		if( isset( $_GET['page'] ) && 'export_plus' == $_GET['page'] ) {
 			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
 			wp_enqueue_script( $this->_token . '-admin' );
+			wp_enqueue_script( 'jquery-ui-datepicker' , array( 'jquery' ) );
 		}
 	} // End admin_enqueue_scripts ()
 
