@@ -45,8 +45,6 @@ function export_plus_date_options( $post_type = 'post' ) {
 
 $start_date = export_plus_date_options();
 
-var_dump( $start_date );
-
 ?>
 
 <script type="text/javascript">
