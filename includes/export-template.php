@@ -34,22 +34,38 @@ function export_plus_date_options( $post_type = 'post' ) {
 	if ( !$start )
 		return;
 
-	$days_since_start = floor( ( time() - strtotime( $start->year . '-' . zeroise( $start->month, 2 ) . '-' . zeroise( $start->day, 2 ) ) ) / 86400 );
+	$start_date = array(
+		'start_year' => $start[0]->year,
+		'start_month' => zeroise( $start[0]->month, 2 ),
+		'start_day' => zeroise( $start[0]->day, 2 )
+	);
+
+	return $start_date;
 }
+
+$start_date = export_plus_date_options();
+
+var_dump( $start_date );
+
 ?>
 
 <script type="text/javascript">
-	var days_since_start = <?php echo $days_since_start; ?>;
+	var start_year = <?php echo $start_date['start_year']; ?>;
+	var start_month = <?php echo $start_date['start_month'] - 1; ?>;
+	var start_day = <?php echo $start_date['start_day']; ?>;
+
 	jQuery(document).ready(function($){
 			$('#post-start-date-picker').datepicker({
-			dateFormat: 'yyyy-mm-dd',
-			minDate: days_since_start,
-			maxDate: 0
+			dateFormat: 'yy-mm-dd',
+			minDate: new Date(start_year, start_month, start_day),
+			maxDate: 0,
+      		hideIfNoPrevNext: true
 		});
 		$('#post-end-date-picker').datepicker({
-			dateFormat: 'yyyy-mm-dd',
-			minDate: days_since_start,
-			maxDate: 0
+			dateFormat: 'yy-mm-dd',
+			minDate: new Date(start_year, start_month, start_day),
+			maxDate: 0,
+			hideIfNoPrevNext: true
 		});
 	});
 </script>
