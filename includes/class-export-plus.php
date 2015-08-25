@@ -188,6 +188,10 @@ class Export_Plus {
 		if( isset( $_GET['page'] ) && 'export_plus' == $_GET['page'] ) {
 			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
 			wp_enqueue_script( $this->_token . '-admin' );
+			wp_enqueue_script( 'jquery-ui-core', array( 'jquery' ) );
+			wp_enqueue_script( 'jquery-ui-datepicker', array( 'jquery-ui-core' ) );
+			wp_register_style( 'export-plus-style', esc_url( $this->assets_url ) . 'css/export-plus.min.css' );
+			wp_enqueue_style( 'export-plus-style' );
 		}
 	} // End admin_enqueue_scripts ()
 

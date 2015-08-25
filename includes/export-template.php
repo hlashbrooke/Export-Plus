@@ -23,26 +23,50 @@ if ( !current_user_can('export') ) {
 function export_plus_date_options( $post_type = 'post' ) {
 	global $wpdb, $wp_locale;
 
-	$months = $wpdb->get_results( $wpdb->prepare( "
-		SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month
+	$start = $wpdb->get_results( $wpdb->prepare( "
+		SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month, DAY( post_date ) AS day
 		FROM $wpdb->posts
 		WHERE post_type = %s AND post_status != 'auto-draft'
-		ORDER BY post_date DESC
+		ORDER BY post_date ASC
+		LIMIT 1
 	", $post_type ) );
 
-	$month_count = count( $months );
-	if ( !$month_count || ( 1 == $month_count && 0 == $months[0]->month ) )
+	if ( !$start )
 		return;
 
-	foreach ( $months as $date ) {
-		if ( 0 == $date->year )
-			continue;
+	$start_date = array(
+		'start_year' => $start[0]->year,
+		'start_month' => zeroise( $start[0]->month, 2 ),
+		'start_day' => zeroise( $start[0]->day, 2 )
+	);
 
-		$month = zeroise( $date->month, 2 );
-		echo '<option value="' . $date->year . '-' . $month . '">' . $wp_locale->get_month( $month ) . ' ' . $date->year . '</option>';
-	}
+	return $start_date;
 }
+
+$start_date = export_plus_date_options();
+
 ?>
+
+<script type="text/javascript">
+	var start_year = <?php echo $start_date['start_year']; ?>;
+	var start_month = <?php echo $start_date['start_month'] - 1; ?>;
+	var start_day = <?php echo $start_date['start_day']; ?>;
+
+	jQuery(document).ready(function($){
+			$('#post-start-date-picker').datepicker({
+			dateFormat: 'yy-mm-dd',
+			minDate: new Date(start_year, start_month, start_day),
+			maxDate: 0,
+      		hideIfNoPrevNext: true
+		});
+		$('#post-end-date-picker').datepicker({
+			dateFormat: 'yy-mm-dd',
+			minDate: new Date(start_year, start_month, start_day),
+			maxDate: 0,
+			hideIfNoPrevNext: true
+		});
+	});
+</script>
 
 <div class="wrap">
 <h2><?php _e( 'Export Plus', 'export-plus' ); ?></h2>
@@ -86,15 +110,14 @@ function export_plus_date_options( $post_type = 'post' ) {
 ?>
 	</li>
 	<li>
-		<label><?php _e( 'Date range:', 'export-plus' ); ?></label>
-		<select name="post_start_date">
-			<option value="0"><?php _e( 'Start Date', 'export-plus' ); ?></option>
-			<?php export_plus_date_options(); ?>
-		</select>
-		<select name="post_end_date">
-			<option value="0"><?php _e( 'End Date', 'export-plus' ); ?></option>
-			<?php export_plus_date_options(); ?>
-		</select>
+		<?php export_plus_date_options(); ?>
+
+		<label for="post-start-date"><?php _e( 'Start date:', 'export-plus' ); ?></label>
+		<input type="text" id="post-start-date-picker" name="post_start_date" />
+
+		<label for="post-end-date"><?php _e( 'End date:', 'export-plus' ); ?></label>
+		<input type="text" id="post-end-date-picker" name="post_end_date" />
+
 	</li>
 	<li>
 		<label><?php _e( 'Status:', 'export-plus' ); ?></label>
